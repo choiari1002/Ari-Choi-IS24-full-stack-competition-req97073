@@ -1,65 +1,60 @@
 import "./App.css";
+import { Navbar, Nav, Container, ListGroup, Button } from 'react-bootstrap';
+import { useState } from "react";
+import { Routes, Route, Link, useNavigate, Outlet } from 'react-router-dom'
+import Data from './Data.js';
+import Detail from './Pages/Detail.js';
 
 function App() {
+  let navigate =  useNavigate();
+  let [products, setProducts] = useState(Data);
+
   return (
     <div classNameName="App">
-      {/* 나브바 */}
-      <nav className="navbar navbar-expand-lg bg-light">
-        <div className="container-fluid">
-          <a className="navbar-brand" href="#">
-            IMB
-          </a>
-          <button
-            className="navbar-toggler"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent"
-            aria-expanded="false"
-            aria-label="Toggle navigation"
-          >
-            <span className="navbar-toggler-icon"></span>
-          </button>
-          <div className="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul className="navbar-nav me-auto mb-2 mb-lg-0">
-              <li className="nav-item">
-                <a className="nav-link active" aria-current="page" href="#">
-                Product List
-                </a>
-              </li>
-              <li className="nav-item">
-                <a className="nav-link" href="#">
-                  Product List
-                </a>
-              </li>
-            </ul>
-            <form className="d-flex" role="search">
-              <input
-                className="form-control me-2"
-                type="search"
-                placeholder="Search"
-                aria-label="Search"
-              ></input>
-              <button className="btn btn-outline-success" type="submit">
-                Search
-              </button>
-            </form>
-          </div>
-        </div>
-      </nav>
-      {/* 나브바 */}
+      <Navbar bg="light" variant="light">
+        <Container>
+          <Navbar.Brand onClick={()=>{ navigate('/') }}>IMB</Navbar.Brand>
+          <Nav className="me-auto">
+            <Nav.Link onClick={()=>{ navigate('/') }}>Product List</Nav.Link>
+          </Nav>
+        </Container>
+      </Navbar>
 
-      {/* 아이템 리스트 */}
-      <div className="container">
-        <div className="row">
-          <div className="col-6 mt-2 mb-2">1. list</div><div className="col-6 gap-2 d-md-flex justify-content-md-end mt-2 mb-2"><button type="button" className="btn btn-secondary">Update</button><button type="button" className="btn btn-danger">Delete</button></div>
-          <div className="col-6 mt-2 mb-2">2. list</div><div className="col-6 gap-2 d-md-flex justify-content-md-end mt-2 mb-2"><button type="button" className="btn btn-secondary">Update</button><button type="button" className="btn btn-danger">Delete</button></div>
-          <div className="col-6 mt-2 mb-2">3. list</div><div className="col-6 gap-2 d-md-flex justify-content-md-end mt-2 mb-2"><button type="button" className="btn btn-secondary">Update</button><button type="button" className="btn btn-danger">Delete</button></div>
-        </div>
-      </div>
-      {/* 아이템 리스트 */}
+      <Routes>
+        <Route path="/" element={ <List products={products}></List> }></Route>
+        <Route path="/detail/:id" element={ <Detail products={products}></Detail> }></Route>
+        <Route path="*" element={<>404 PAGE</>} />
+      </Routes>
+
+
     </div>
   );
+}
+
+function List(props) {
+  return(
+    <ListGroup variant="flush">
+      {
+        props.products.map(function(product, i){
+          return(
+            <ListGroup.Item className="d-flex justify-content-between align-items-center">
+              <Link to={`/detail/${product.productId}`} style={{ color: "inherit", textDecoration: "none" }}>
+                {i + 1}. {product.productName}
+              </Link>
+              <div className="d-flex">
+                <Button variant="warning" className="ms-2">
+                  Update
+                </Button>
+                <Button variant="danger" className="ms-2">
+                  Delete
+                </Button>
+              </div>
+            </ListGroup.Item>
+          )
+        })
+      }
+    </ListGroup>
+  )
 }
 
 export default App;
