@@ -14,7 +14,7 @@ function Detail(props) {
     return(
         <div className="container">
             <div className="row">
-                <h4>{ product.productName }</h4>
+                <h4>{ product.productName } (ID : {product.productId})</h4>
                 <p>Product Owner Name : { product.productOwnerName }</p>
                 <p>Developers :</p>
                 {

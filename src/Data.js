@@ -73,6 +73,81 @@ let data = [
     scrumMasterName: "John Smith",
     startDate: "2022/02/01",
     methodology: "Scrum"
+  },
+  {
+    productId: 6,
+    productName: "Project F",
+    productOwnerName: "Amanda Johnson",
+    Developers: [
+      "John Smith",
+      "David Lee",
+      "Jason Kim",
+      "Lisa Chen",
+      "Michael Davis"
+    ],
+    scrumMasterName: "Julia Lee",
+    startDate: "2022/04/01",
+    methodology: "Kanban"
+  },
+  {
+    productId: 7,
+    productName: "Project G",
+    productOwnerName: "Jennifer Lee",
+    Developers: [
+      "Mary Brown",
+      "David Lee",
+      "Lisa Chen",
+      "Jason Kim",
+      "Mark Taylor"
+    ],
+    scrumMasterName: "Amanda Johnson",
+    startDate: "2021/11/15",
+    methodology: "Scrum"
+  },
+  {
+    productId: 8,
+    productName: "Project H",
+    productOwnerName: "David Lee",
+    Developers: [
+      "John Smith",
+      "Lisa Chen",
+      "Amanda Johnson",
+      "Julia Lee",
+      "Sarah Johnson"
+    ],
+    scrumMasterName: "Michael Davis",
+    startDate: "2022/03/15",
+    methodology: "Kanban"
+  },
+  {
+    productId: 9,
+    productName: "Project I",
+    productOwnerName: "Julia Lee",
+    Developers: [
+      "David Lee",
+      "Lisa Chen",
+      "Jason Kim",
+      "Amanda Johnson",
+      "Jennifer Lee"
+    ],
+    scrumMasterName: "John Smith",
+    startDate: "2022/01/15",
+    methodology: "Scrum"
+  },
+  {
+    productId: 10,
+    productName: "Project J",
+    productOwnerName: "Mark Taylor",
+    Developers: [
+      "John Smith",
+      "David Lee",
+      "Lisa Chen",
+      "Jason Kim",
+      "Michael Davis"
+    ],
+    scrumMasterName: "Amanda Johnson",
+    startDate: "2022/05/01",
+    methodology: "Kanban"
   }
 ]
 
