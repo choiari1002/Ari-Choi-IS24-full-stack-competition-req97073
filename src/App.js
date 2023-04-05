@@ -1,65 +1,160 @@
 import "./App.css";
+import { Navbar, Nav, Container, ListGroup, Button, Form } from 'react-bootstrap';
+import { useState } from "react";
+import { Routes, Route, Link, useNavigate, Outlet } from 'react-router-dom'
+import Data from './Data.js';
+import Detail from './Pages/Detail.js';
+import Edit from './Pages/Edit.js';
+import Add from './Pages/Add.js';
 
 function App() {
-  return (
-    <div classNameName="App">
-      {/* 나브바 */}
-      <nav className="navbar navbar-expand-lg bg-light">
-        <div className="container-fluid">
-          <a className="navbar-brand" href="#">
-            IMB
-          </a>
-          <button
-            className="navbar-toggler"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent"
-            aria-expanded="false"
-            aria-label="Toggle navigation"
-          >
-            <span className="navbar-toggler-icon"></span>
-          </button>
-          <div className="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul className="navbar-nav me-auto mb-2 mb-lg-0">
-              <li className="nav-item">
-                <a className="nav-link active" aria-current="page" href="#">
-                Product List
-                </a>
-              </li>
-              <li className="nav-item">
-                <a className="nav-link" href="#">
-                  Product List
-                </a>
-              </li>
-            </ul>
-            <form className="d-flex" role="search">
-              <input
-                className="form-control me-2"
-                type="search"
-                placeholder="Search"
-                aria-label="Search"
-              ></input>
-              <button className="btn btn-outline-success" type="submit">
-                Search
-              </button>
-            </form>
-          </div>
-        </div>
-      </nav>
-      {/* 나브바 */}
+  const navigate = useNavigate();
+  const [allProducts] = useState(Data);
+  const [filteredProducts, setFilteredProducts] = useState(allProducts);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedOption, setSelectedOption] = useState("");
 
-      {/* 아이템 리스트 */}
-      <div className="container">
-        <div className="row">
-          <div className="col-6 mt-2 mb-2">1. list</div><div className="col-6 gap-2 d-md-flex justify-content-md-end mt-2 mb-2"><button type="button" className="btn btn-secondary">Update</button><button type="button" className="btn btn-danger">Delete</button></div>
-          <div className="col-6 mt-2 mb-2">2. list</div><div className="col-6 gap-2 d-md-flex justify-content-md-end mt-2 mb-2"><button type="button" className="btn btn-secondary">Update</button><button type="button" className="btn btn-danger">Delete</button></div>
-          <div className="col-6 mt-2 mb-2">3. list</div><div className="col-6 gap-2 d-md-flex justify-content-md-end mt-2 mb-2"><button type="button" className="btn btn-secondary">Update</button><button type="button" className="btn btn-danger">Delete</button></div>
-        </div>
-      </div>
-      {/* 아이템 리스트 */}
+  const [developer, setDeveloper] = useState(false);
+  const [searchDeveloper, setSearchDeveloper] = useState("");
+
+  function handleChange(event) {
+    setSelectedOption(event.target.value);
+  }
+
+  function handleSearch(event) {
+    const value = event.target.value.toLowerCase();
+    setSearchTerm(value);
+    if (!value) {
+      setFilteredProducts(allProducts);
+      return;
+    }
+    const filtered = allProducts.filter((product) => {
+      if (selectedOption === "productName") {
+        return product.productName.toLowerCase().includes(value);
+      } else if (selectedOption === "scrumMasterName") {
+        return product.scrumMasterName.toLowerCase().includes(value);
+      } else if (selectedOption === "developerName") {
+        const found = product.Developers.some((developer) =>
+          developer.toLowerCase().includes(value)
+        );
+        if (found) {
+          setSearchDeveloper(value)
+          setDeveloper(true);
+        } else {
+          setDeveloper(false);
+        }
+        return found;
+      }
+      return true;
+    });
+    setFilteredProducts(filtered);
+  }
+
+
+  return (
+    <div className="App">
+      <Navbar bg="light" variant="light">
+        <Container>
+          <Navbar.Brand onClick={() => navigate("/")}>IMB</Navbar.Brand>
+          <Nav className="me-auto">
+            <Nav.Link onClick={() => navigate("/")}>Product List</Nav.Link>
+          </Nav>
+          <Form className="d-flex">
+            <Form.Select aria-label="Default select example" onChange={handleChange}>
+              <option>Select an option</option>
+              <option value="productName">Product Name</option>
+              <option value="scrumMasterName">Scrum Master Name</option>
+              <option value="developerName">Developer</option>
+            </Form.Select>
+            <Form.Control
+              type="search"
+              placeholder="Search"
+              className="me-2"
+              aria-label="Search"
+              value={searchTerm}
+              onChange={handleSearch}
+            />
+            <Button variant="outline-dark" onClick={handleSearch}>
+              Search
+            </Button>
+          </Form>
+        </Container>
+      </Navbar>
+
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <div className="d-flex flex-column">
+              <div className="d-flex justify-content-between align-items-center">
+                <div className="d-flex flex-column">
+                  <h3 className="mt-3 ms-2">
+                    Total Number Of Products In IBM : {allProducts.length}
+                  </h3>
+                  {
+                    developer == true ? <h4 className="ms-2"> {searchDeveloper} is involved in {filteredProducts.length} projects.</h4> : null
+                  }
+                </div>
+                <div className="me-3">
+                  <Link to="/add">
+                    <Button variant="success" className="ms-auto">New Product</Button>
+                  </Link>
+                </div>
+              </div>
+              <List products={filteredProducts} />
+            </div>
+          }
+
+        ></Route>
+        <Route
+          path="/detail/:id"
+          element={<Detail products={filteredProducts} />}
+        ></Route>
+        <Route
+          path="/edit/:id"
+          element={<Edit products={filteredProducts} />}
+        ></Route>
+        <Route path="/add" element={<Add />} />
+        <Route path="*" element={<>404 PAGE</>} />
+      </Routes>
     </div>
   );
+}
+
+
+function List(props) {
+  return(
+    <ListGroup variant="flush">
+      {
+        props.products.map(function(product, i){
+          return(
+            <ListGroup.Item className="d-flex justify-content-between align-items-center">
+              <Link to={`/detail/${product.productId}`} style={{ color: "inherit", textDecoration: "none" }}>
+                {product.productId}. {product.productName}
+                <p>Scrum Master Name : { product.scrumMasterName }</p>
+                <p>Developers :</p>
+                {
+                    product.Developers.map(function(developer,i){
+                        return(
+                            <p>- { developer }</p>
+                        )
+                    })
+                }
+              </Link>
+              <div className="d-flex">
+                <Link to={`/edit/${product.productId}`} className="btn btn-warning ms-2">
+                  Update
+                </Link>
+                <Button variant="danger" className="ms-2">
+                  Delete
+                </Button>
+              </div>
+            </ListGroup.Item>
+          )
+        })
+      }
+    </ListGroup>
+  )
 }
 
 export default App;
