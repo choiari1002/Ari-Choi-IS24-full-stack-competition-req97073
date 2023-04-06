@@ -3,33 +3,35 @@ import "react-datepicker/dist/react-datepicker.css";
 import { useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
+import axios from 'axios'
 
 function Add() {
   const [startDate, setStartDate] = useState(null);
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     const form = event.currentTarget;
     const formData = {
-      productId: form.productId.value,
       productName: form.productName.value,
       productOwnerName: form.productOwnerName.value,
-      Developers: form.developers.value.split(",").slice(0, 5).map(name => name.trim()),
+      Developers: form.developers.value.split(",").slice(0, 5).map((name) => name.trim()),
       scrumMasterName: form.scrumMasterName.value,
       startDate: startDate ? startDate.toLocaleDateString() : "",
       methodology: form.methodology.value,
     };
-    console.log(formData);
-    // TODO: 서버에 넣는 부분 추가 예정
+
+    try {
+      const response = await axios.post("http://localhost:8080/api/create", formData);
+      console.log(response.data);
+      alert("good")
+    } catch (error) {
+      console.error(error);
+      alert("bed")
+    }
   };
 
   return (
     <Form onSubmit={handleSubmit}>
-      <Form.Group className="mb-3" controlId="productId">
-        <Form.Label>Product ID</Form.Label>
-        <Form.Control type="text" name="productId" />
-      </Form.Group>
-
       <Form.Group className="mb-3" controlId="productName">
         <Form.Label>Product Name</Form.Label>
         <Form.Control type="text" name="productName" />
