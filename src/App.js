@@ -1,21 +1,37 @@
 import "./App.css";
 import { Navbar, Nav, Container, ListGroup, Button, Form } from 'react-bootstrap';
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Routes, Route, Link, useNavigate, Outlet } from 'react-router-dom'
-import Data from './Data.js';
+import axios from 'axios'
 import Detail from './Pages/Detail.js';
 import Edit from './Pages/Edit.js';
 import Add from './Pages/Add.js';
 
 function App() {
   const navigate = useNavigate();
-  const [allProducts] = useState(Data);
-  const [filteredProducts, setFilteredProducts] = useState(allProducts);
+  const [allProducts, setAllProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedOption, setSelectedOption] = useState("");
-
   const [developer, setDeveloper] = useState(false);
   const [searchDeveloper, setSearchDeveloper] = useState("");
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const response = await axios.get('http://localhost:8080/api/data');
+        console.log(response.data);
+        setAllProducts(response.data)
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    setFilteredProducts(allProducts);
+  }, [allProducts]);
 
   function handleChange(event) {
     setSelectedOption(event.target.value);
@@ -123,12 +139,12 @@ function App() {
 
 
 function List(props) {
-  return(
+  return props.products ? (
     <ListGroup variant="flush">
       {
         props.products.map(function(product, i){
           return(
-            <ListGroup.Item className="d-flex justify-content-between align-items-center">
+            <ListGroup.Item key={product.productId} className="d-flex justify-content-between align-items-center" >
               <Link to={`/detail/${product.productId}`} style={{ color: "inherit", textDecoration: "none" }}>
                 {product.productId}. {product.productName}
                 <p>Scrum Master Name : { product.scrumMasterName }</p>
@@ -136,7 +152,7 @@ function List(props) {
                 {
                     product.Developers.map(function(developer,i){
                         return(
-                            <p>- { developer }</p>
+                            <p key={i}>- { developer }</p>
                         )
                     })
                 }
@@ -154,7 +170,7 @@ function List(props) {
         })
       }
     </ListGroup>
-  )
+  ) : null;
 }
 
 export default App;
