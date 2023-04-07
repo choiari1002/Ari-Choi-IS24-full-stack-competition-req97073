@@ -24,6 +24,7 @@ function Add() {
       const response = await axios.post("http://localhost:8080/api/create", formData);
       console.log(response.data);
       alert("good")
+      window.location.replace('/')
     } catch (error) {
       console.error(error);
       alert("bed")
