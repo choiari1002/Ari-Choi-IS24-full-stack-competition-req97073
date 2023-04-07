@@ -1,7 +1,8 @@
 import { useState } from "react";
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
+
 
 function Edit(props) {
   let {id} = useParams();
@@ -18,12 +19,36 @@ function Edit(props) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // 수정 보내기
-    alert("수정되었습니다!")
+    fetch(`http://localhost:8080/api/update/${updatedProduct.productId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(updatedProduct)
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log(data);
+      alert('updated!');
+      window.location.replace('/')
+    })
+    .catch(error => {
+      console.error(error);
+      alert('error');
+    });
   };
 
   return (
     <Form onSubmit={handleSubmit}>
+      <Form.Group className="mb-3" controlId="productName">
+        <Form.Label>Product Id</Form.Label>
+        <Form.Control
+          type="text"
+          name="productId"
+          value={updatedProduct.productId}
+          disabled
+        />
+      </Form.Group>
       <Form.Group className="mb-3" controlId="productName">
         <Form.Label>Product Name</Form.Label>
         <Form.Control
@@ -75,7 +100,7 @@ function Edit(props) {
       </Form.Group>
 
       <Button variant="primary" type="submit">
-        Submit
+        Update
       </Button>
     </Form>
   );
