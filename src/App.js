@@ -139,6 +139,18 @@ function App() {
 
 
 function List(props) {
+
+  async function handleDelete(productId) {
+    axios.delete(`http://localhost:8080/api/delete/${productId}`)
+    .then(response => {
+      console.log(response.data);
+      alert("deleted!")
+      window.location.reload();
+    })
+    .catch(error => {
+      console.error(error);
+    });
+  }
   return props.products ? (
     <ListGroup variant="flush">
       {
@@ -161,7 +173,7 @@ function List(props) {
                 <Link to={`/edit/${product.productId}`} className="btn btn-warning ms-2">
                   Update
                 </Link>
-                <Button variant="danger" className="ms-2">
+                <Button variant="danger" className="ms-2" onClick={() => handleDelete(product.productId)}>
                   Delete
                 </Button>
               </div>
