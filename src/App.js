@@ -10,7 +10,7 @@ import Add from './Pages/Add.js';
 function App() {
   const navigate = useNavigate();
   const [allProducts, setAllProducts] = useState([]);
-  const [filteredProducts, setFilteredProducts] = useState();
+  const [filteredProducts, setFilteredProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedOption, setSelectedOption] = useState("");
   const [developer, setDeveloper] = useState(false);
@@ -37,36 +37,37 @@ function App() {
     setSelectedOption(event.target.value);
   }
 
-  function handleSearch(event) {
-    const value = event.target.value.toLowerCase();
-    setSearchTerm(value);
-    if (!value) {
-      setFilteredProducts(allProducts);
-      return;
-    }
-    const filtered = allProducts.filter((product) => {
-      if (selectedOption === "productName") {
-        return product.productName.toLowerCase().includes(value);
-      } else if (selectedOption === "scrumMasterName") {
-        return product.scrumMasterName.toLowerCase().includes(value);
-      } else if (selectedOption === "developerName") {
-        const found = product.Developers.some((developer) =>
-          developer.toLowerCase().includes(value)
-        );
-        if (found) {
-          setSearchDeveloper(value)
+  function handleSearchButtonClick(event) {
+    event.preventDefault();
+    const url = `http://localhost:8080/api/search?searchTerm=${searchTerm}&selectedOption=${selectedOption}`;
+    async function fetchData() {
+      try {
+        const response = await axios.get(url);
+        console.log(response.data);
+        setFilteredProducts(response.data)
+
+        const foundDeveloper = response.data.some((product) => {
+          return product.Developers.some((developer) =>
+            developer.toLowerCase().includes(searchTerm)
+          );
+        });
+        if (foundDeveloper) {
+          setSearchDeveloper(searchTerm);
           setDeveloper(true);
         } else {
           setDeveloper(false);
         }
-        return found;
+      } catch (error) {
+        console.error(error);
       }
-      return true;
-    });
-    setFilteredProducts(filtered);
+    }
+    fetchData();
   }
 
-
+  function handleFormSubmit(event) {
+    event.preventDefault();
+    handleSearchButtonClick(event);
+  }
   return (
     <div className="App">
       <Navbar bg="light" variant="light">
@@ -75,7 +76,7 @@ function App() {
           <Nav className="me-auto">
             <Nav.Link onClick={() => navigate("/")}>Product List</Nav.Link>
           </Nav>
-          <Form className="d-flex">
+          <Form className="d-flex" onSubmit={handleFormSubmit}>
             <Form.Select aria-label="Default select example" onChange={handleChange}>
               <option>Select an option</option>
               <option value="productName">Product Name</option>
@@ -88,9 +89,9 @@ function App() {
               className="me-2"
               aria-label="Search"
               value={searchTerm}
-              onChange={handleSearch}
+              onChange={(e) => setSearchTerm(e.target.value)}
             />
-            <Button variant="outline-dark" onClick={handleSearch}>
+            <Button variant="outline-dark" onClick={handleSearchButtonClick}>
               Search
             </Button>
           </Form>
@@ -108,7 +109,7 @@ function App() {
                     Total Number Of Products In IBM : {allProducts.length}
                   </h3>
                   {
-                    developer == true ? <h4 className="ms-2"> {searchDeveloper} is involved in {filteredProducts.length} projects.</h4> : null
+                    developer === true ? <h4 className="ms-2"> {searchDeveloper} is involved in {filteredProducts.length} projects.</h4> : null
                   }
                 </div>
                 <div className="me-3">
