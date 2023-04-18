@@ -17,33 +17,46 @@ function App() {
   const [searchDeveloper, setSearchDeveloper] = useState("");
 
   useEffect(() => {
+    // async/await 사용해서 비동기적으로 데이터 가져오기.
     async function fetchData() {
       try {
         const response = await axios.get('http://localhost:8080/api/data');
         console.log(response.data);
+        // 받아온 응답으로 allProducts 스테이트 변경
         setAllProducts(response.data)
       } catch (error) {
         console.error(error);
       }
     }
     fetchData();
+    // 두번째 인자로 받는 배열 : 배열에 포함된 값이 변경될 때 함수 실행. 만약 빈 배열을 전달하면 컴포넌트가 처음 마운트 될 때만 함수 실행.
   }, []);
 
+  // allProducts 값이 변경될 때마다 setFilteredProducts 를 업데이트 해주기.
   useEffect(() => {
     setFilteredProducts(allProducts);
   }, [allProducts]);
 
+  // 이벤트 핸들러 -> 검색창 옵션이 바뀌면 selectedOption 업데이트
   function handleChange(event) {
     setSelectedOption(event.target.value);
   }
 
+  // search 버튼 누르면 함수 실행
   function handleSearchButtonClick(event) {
+    // 기본 동작 취소함수 (자동으로 새로고침하는 부분 방지 위해서 넣어줌)
     event.preventDefault();
+
+    // 서버에 GET 요청 보낼 url 만들기 (검색)
     const url = `http://localhost:8080/api/search?searchTerm=${searchTerm}&selectedOption=${selectedOption}`;
+
     async function fetchData() {
       try {
+        // 요청 보내고 응답을 받아 response 변수에 저장
         const response = await axios.get(url);
         console.log(response.data);
+
+        // 응답에서 가져온 데이터를 filteredProducts 에 업데이트
         setFilteredProducts(response.data)
 
         const foundDeveloper = response.data.some((product) => {
@@ -51,6 +64,8 @@ function App() {
             developer.toLowerCase().includes(searchTerm)
           );
         });
+        // 응답 개발자 중에서 검색어를 포함한 경우 (true 라면)
+        // setSearchDeveloper 를 이용해 검색한 개발자 이름 업데이트 + setDeveloper 를 이용해 true 로 업데이트
         if (foundDeveloper) {
           setSearchDeveloper(searchTerm);
           setDeveloper(true);
@@ -64,10 +79,12 @@ function App() {
     fetchData();
   }
 
+  // 검색버튼을 누르거나 엔터키를 누르면 실행 (엔터 누르면 새로고침 현상 없애기 위해 추가)
   function handleFormSubmit(event) {
     event.preventDefault();
     handleSearchButtonClick(event);
   }
+
   return (
     <div className="App">
       <Navbar bg="light" variant="light">
@@ -123,15 +140,23 @@ function App() {
           }
 
         ></Route>
+
+        {/* 제품 상세페이지 */}
         <Route
           path="/detail/:id"
           element={<Detail products={filteredProducts} />}
         ></Route>
+
+        {/* 제품 수정페이지 */}
         <Route
           path="/edit/:id"
           element={<Edit products={filteredProducts} />}
         ></Route>
+
+        {/* 제품 추가페이지 */}
         <Route path="/add" element={<Add />} />
+
+        {/* 404페이지 */}
         <Route path="*" element={<>404 PAGE</>} />
       </Routes>
     </div>
@@ -142,6 +167,7 @@ function App() {
 function List(props) {
 
   async function handleDelete(productId) {
+    // 서버에 DELETE 요청
     axios.delete(`http://localhost:8080/api/delete/${productId}`)
     .then(response => {
       console.log(response.data);
@@ -152,6 +178,7 @@ function List(props) {
       console.error(error);
     });
   }
+
   return props.products ? (
     <ListGroup variant="flush">
       {

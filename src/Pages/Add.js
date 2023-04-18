@@ -10,17 +10,23 @@ function Add() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    // 폼 엘리먼트 참조
     const form = event.currentTarget;
+    // 입력한 값을 가져와 객체에 저장
     const formData = {
       productName: form.productName.value,
       productOwnerName: form.productOwnerName.value,
+      // split 이용해 , 기준으로 나눠 배열로 바꾼 뒤 splice 를 이용해서 최대 5개 요소만 추출
+      // map() 함수를 사용해 각 요소에 trim() 적용
       Developers: form.developers.value.split(",").slice(0, 5).map((name) => name.trim()),
       scrumMasterName: form.scrumMasterName.value,
-      startDate: startDate ? startDate.toLocaleDateString() : "",
+      // toLocaleDateString() : 날짜 객체를 문자열로 변환
+      startDate: startDate ? startDate.toLocaleDateString('en-GB').split('/').reverse().join('/') : "",
       methodology: form.methodology.value,
     };
 
     try {
+      // 서버로 formDate 와 함께 POST 요청
       const response = await axios.post("http://localhost:8080/api/create", formData);
       console.log(response.data);
       alert("good")

@@ -2,40 +2,40 @@ import { useState } from "react";
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import { useParams, useNavigate } from "react-router-dom";
+import axios from 'axios';
 
 
 function Edit(props) {
-  let {id} = useParams();
-  let product = props.products.find(function(x) {
-    return x.productId == id;
+
+  let {id} = useParams(); // 현재 url 에서 파라미터 값 추출
+
+  // find() 메서드는 배열을 돌며 주어진 조건을 만족하는 첫번째 요소를 반환하거나 없을경우 undefined 반환
+  let product = props.products.find(function(product) {
+    return product.productId == id;
   });
 
   const [updatedProduct, setUpdatedProduct] = useState(product);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
+  // 입력한 값에 따라서 updateProduct 객체를 업데이트 하는 역할
+  const handleInputChange = (event) => {
+    const { name, value } = event.target;
+    // 이전의 updatedProduct 를 복사하고 새로운 값을 추가하여 새로운 객체 생성
     setUpdatedProduct({ ...updatedProduct, [name]: value });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    fetch(`http://localhost:8080/api/update/${updatedProduct.productId}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(updatedProduct)
-    })
-    .then(response => response.json())
-    .then(data => {
-      console.log(data);
+  const handleSubmit = async (event) => {
+    // 페이지 새로고침 방지
+    event.preventDefault();
+    try {
+      // 수정된 데이터를 PUT 요청
+      const response = await axios.put(`http://localhost:8080/api/update/${updatedProduct.productId}`, updatedProduct);
+      console.log(response.data);
       alert('updated!');
-      window.location.replace('/')
-    })
-    .catch(error => {
+      window.location.replace('/');
+    } catch (error) {
       console.error(error);
       alert('error');
-    });
+    }
   };
 
   return (

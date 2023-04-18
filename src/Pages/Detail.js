@@ -7,8 +7,8 @@ function Detail(props) {
     })
 
     let {id} = useParams();
-    let product = props.products.find(function(x){
-        return x.productId == id
+    let product = props.products.find(function(product){
+        return product.productId == id
       });
 
     return(
